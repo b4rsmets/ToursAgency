@@ -8,7 +8,7 @@ import ssl
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
 
-database_url = 'postgresql+pg8000://username:password@host:port/database_name'
+database_url = 'postgresql+pg8000://ilya:nfPE31Jkkps6BbDCVZwOKpBgHw3eUwrQ@dpg-d4e4g8h5pdvs73fkv8ig-a.oregon-postgres.render.com/toursdb_tz10'
 
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
