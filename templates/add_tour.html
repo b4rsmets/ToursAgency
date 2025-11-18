@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+
+{% block title %}Добавить тур{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <!-- Заголовок с иконкой -->
+            <div class="text-center mb-5">
+                <div class="bg-primary bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                     style="width: 80px; height: 80px;">
+                    <i class="fas fa-plus text-white fa-2x"></i>
+                </div>
+                <h1 class="h2 fw-bold text-dark mb-2">Добавить новый тур</h1>
+                <p class="text-muted">Заполните информацию о новом туристическом предложении</p>
+            </div>
+
+            <!-- Карточка формы -->
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white py-4">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Основная информация
+                    </h3>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" class="needs-validation" novalidate>
+                        <!-- Название тура -->
+                        <div class="mb-4">
+                            <label for="name" class="form-label fw-semibold text-dark">
+                                <i class="fas fa-heading text-primary me-2"></i>Название тура
+                            </label>
+                            <input type="text"
+                                   id="name"
+                                   name="name"
+                                   required
+                                   class="form-control form-control-lg"
+                                   placeholder="Введите название тура">
+                            <div class="form-text">Укажите привлекательное название для тура</div>
+                        </div>
+
+                        <!-- Описание -->
+                        <div class="mb-4">
+                            <label for="description" class="form-label fw-semibold text-dark">
+                                <i class="fas fa-align-left text-primary me-2"></i>Описание тура
+                            </label>
+                            <textarea id="description"
+                                      name="description"
+                                      required
+                                      rows="4"
+                                      class="form-control"
+                                      placeholder="Опишите основные особенности и преимущества тура"></textarea>
+                            <div class="form-text">Подробно опишите, что включено в тур</div>
+                        </div>
+
+                        <!-- Цена и продолжительность в одной строке -->
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label for="price" class="form-label fw-semibold text-dark">
+                                    <i class="fas fa-dollar-sign text-success me-2"></i>Стоимость тура
+                                </label>
+                                <div class="input-group">
+                                    <input type="number"
+                                           id="price"
+                                           name="price"
+                                           step="0.01"
+                                           required
+                                           class="form-control"
+                                           placeholder="0.00">
+                                    <span class="input-group-text">₽</span>
+                                </div>
+                                <div class="form-text">Укажите стоимость за одного человека</div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label for="duration_days" class="form-label fw-semibold text-dark">
+                                    <i class="fas fa-calendar-day text-warning me-2"></i>Продолжительность
+                                </label>
+                                <div class="input-group">
+                                    <input type="number"
+                                           id="duration_days"
+                                           name="duration_days"
+                                           required
+                                           class="form-control"
+                                           placeholder="0">
+                                    <span class="input-group-text">дней</span>
+                                </div>
+                                <div class="form-text">Общее количество дней тура</div>
+                            </div>
+                        </div>
+
+                        <!-- Направление -->
+                        <div class="mb-4">
+                            <label for="destination" class="form-label fw-semibold text-dark">
+                                <i class="fas fa-map-marker-alt text-danger me-2"></i>Направление
+                            </label>
+                            <input type="text"
+                                   id="destination"
+                                   name="destination"
+                                   required
+                                   class="form-control"
+                                   placeholder="Например: Париж, Франция">
+                            <div class="form-text">Укажите страну и город назначения</div>
+                        </div>
+
+                        <!-- URL изображения -->
+                        <div class="mb-4">
+                            <label for="image_url" class="form-label fw-semibold text-dark">
+                                <i class="fas fa-image text-info me-2"></i>Ссылка на изображение
+                            </label>
+                            <input type="url"
+                                   id="image_url"
+                                   name="image_url"
+                                   class="form-control"
+                                   placeholder="https://example.com/image.jpg">
+                            <div class="form-text">
+                                <small>Оставьте пустым для использования изображения по умолчанию</small>
+                            </div>
+                        </div>
+
+                        <!-- Кнопки действий -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a href="{{ url_for('index') }}" class="btn flex !items-center !text-center btn-outline-secondary me-md-2">
+                                <i class="fas fa-arrow-left  me-2"></i>Назад
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-lg px-4">
+                                <i class="fas fa-plus me-2"></i>Добавить тур
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Подсказки -->
+            <div class="mt-4">
+                <div class="alert alert-info border-0">
+                    <div class="d-flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-lightbulb text-warning fa-lg"></i>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="alert-heading">Советы по заполнению</h6>
+                            <ul class="mb-0">
+                                <li>Используйте яркие и описательные названия</li>
+                                <li>Указывайте реальные и привлекательные цены</li>
+                                <li>Добавляйте качественные изображения для лучшего восприятия</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Стили для улучшения внешнего вида -->
+<style>
+.card {
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.card-header {
+    border-radius: 15px 15px 0 0 !important;
+}
+
+.form-control {
+    border-radius: 10px;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.1);
+}
+
+.form-label {
+    font-size: 0.95rem;
+}
+
+.btn {
+    border-radius: 10px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.alert {
+    border-radius: 12px;
+}
+
+.input-group-text {
+    border-radius: 0 10px 10px 0;
+    background-color: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-left: none;
+}
+
+.form-control:not(:first-child) {
+    border-radius: 10px 0 0 10px;
+    border-right: none;
+}
+</style>
+
+<!-- JavaScript для валидации формы -->
+<script>
+// Валидация формы
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        var validation = Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+
+// Подсказка при наведении
+document.addEventListener('DOMContentLoaded', function() {
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    const tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Туристическое Агентство{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Навигация -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="fas fa-plane"></i> Турагентство
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="navbar-nav ms-auto">
+                    {% if current_user.is_authenticated %}
+                        {% if current_user.is_admin() %}
+                            <a class="nav-link" href="{{ url_for('add_tour') }}">
+                                <i class="fas fa-plus"></i> Добавить тур
+                            </a>
+                            <a class="nav-link" href="{{ url_for('admin_orders') }}">
+                                <i class="fas fa-tasks"></i> Заказы
+                            </a>
+                        {% else %}
+                            <a class="nav-link" href="{{ url_for('my_orders') }}">
+                                <i class="fas fa-shopping-bag"></i> Мои заказы
+                            </a>
+                        {% endif %}
+
+                        <div class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user"></i> {{ current_user.username }}
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{{ url_for('profile') }}">Профиль</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{{ url_for('logout') }}">Выйти</a></li>
+                            </ul>
+                        </div>
+                    {% else %}
+                        <a class="nav-link" href="{{ url_for('login') }}">Войти</a>
+                        <a class="nav-link" href="{{ url_for('register') }}">Регистрация</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash сообщения -->
+    <div class="flash-messages">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Основной контент -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Футер -->
+    <footer class="bg-dark mt-5 text-light py-5">
+        <div class="container">
+            <div class="row">
+                <!-- Левая колонка - Информация о горящих турах -->
+                <div class="col-lg-6 mb-4">
+                    <h5 class="text-warning mb-3">Что нужно знать о горящих турах</h5>
+                    <p class="text-light-50 mb-4">
+                        Горящие туры – это возможность отправиться в спонтанное приключение по выгодной цене!
+                        Мы собрали для вас самую важную информацию, благодаря которой вы сможете подобрать
+                        именно то, о чем мечтали, и не беспокоиться о предстоящем отдыхе.
+                    </p>
+
+                    <ul class="list-unstyled text-light-50">
+                        <li class="mb-2">
+                            <i class="fas fa-calendar-check text-warning me-2"></i>
+                            Горящие туры всегда предлагают ближайшую дату начала путешествия, до 6 дней с момента покупки
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-warning me-2"></i>
+                            Горящий тур включает все необходимые услуги: перелет, проживание, трансфер и страховку
+                        </li>
+                        <li class="mb-3">
+                            <i class="fas fa-passport text-warning me-2"></i>
+                            Убедитесь, что срок действия загранпаспорта составляет не менее 6 месяцев от начала отдыха
+                        </li>
+                    </ul>
+
+                    <p class="text-light-50">
+                        Помните об этих деталях и ваш отдых ничего не испортит. Выбирайте страну и отель,
+                        и отправляйтесь в свое идеальное путешествие!
+                    </p>
+                </div>
+
+                <!-- Правая колонка - Контакты -->
+                <div class="col-lg-6 mb-4">
+                    <h5 class="text-warning mb-4">Контактная информация</h5>
+
+                    <!-- Первый номер -->
+                    <div class="contact-item mb-4">
+                        <div class="d-flex align-items-start mb-2">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-phone-alt text-warning fa-lg mt-1"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <div class="fw-semibold text-light">+7 495 502 12 06</div>
+                                <div class="text-light-50 small">
+                                    Отдел по работе с частными клиентами, вопросам по заказу
+                                </div>
+                            </div>
+                        </div>
+                        <a href="tel:+74955021206" class="btn btn-outline-warning btn-sm">
+                            <i class="fas fa-phone me-1"></i>Позвонить
+                        </a>
+                    </div>
+
+                    <!-- Второй номер -->
+                    <div class="contact-item">
+                        <div class="d-flex align-items-start mb-2">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-headset text-warning fa-lg mt-1"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <div class="fw-semibold text-light">+7 495 258 67 08</div>
+                                <div class="text-light-50 small">
+                                    Горячая линия для туристов 24/7, экстренные ситуации
+                                </div>
+                            </div>
+                        </div>
+                        <a href="tel:+74952586708" class="btn btn-outline-warning btn-sm">
+                            <i class="fas fa-phone me-1"></i>Позвонить
+                        </a>
+                    </div>
+
+                    <!-- Дополнительная контактная информация -->
+                    <div class="mt-4 pt-3 border-top border-secondary">
+                        <div class="row">
+                            <div class="col-sm-6 mb-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-envelope text-warning me-2"></i>
+                                    <div>
+                                        <div class="small text-light-50">Email</div>
+                                        <div class="small text-light">info@touragency.ru</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 mb-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-clock text-warning me-2"></i>
+                                    <div>
+                                        <div class="small text-light-50">Время работы</div>
+                                        <div class="small text-light">Пн-Пт: 9:00-20:00</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Нижняя часть футера -->
+            <div class="border-top border-secondary pt-4 mt-3">
+                <div class="row align-items-center">
+                    <div class="col-md-6 text-center text-md-start">
+                        <p class="mb-0 text-light-50">
+                            Курсовой проект Яковлева Ильи ИСТ-31
+                        </p>
+                    </div>
+                    <div class="col-md-6 text-center text-md-end">
+                        <div class="social-links">
+                            <a href="#" class="text-light-50 me-3" title="Telegram">
+                                <i class="fab fa-telegram-plane fa-lg"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+<style>
+    .bg-dark {
+        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%) !important;
+    }
+
+    .text-light-50 {
+        color: rgba(255, 255, 255, 0.8) !important;
+    }
+
+    .contact-item {
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-outline-warning {
+        border-color: #ffc107;
+        color: #ffc107;
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline-warning:hover {
+        background-color: #ffc107;
+        color: #000;
+        transform: translateY(-2px);
+    }
+
+    .social-links a {
+        transition: all 0.3s ease;
+        opacity: 0.7;
+    }
+
+    .social-links a:hover {
+        opacity: 1;
+        color: #ffc107 !important;
+        transform: translateY(-2px);
+    }
+
+    .list-unstyled li {
+        padding-left: 0.5rem;
+    }
+
+    /* Адаптивность для мобильных */
+    @media (max-width: 768px) {
+        .contact-item {
+            text-align: center;
+        }
+
+        .contact-item .d-flex {
+            justify-content: center;
+            text-align: center;
+        }
+
+        .social-links {
+            margin-top: 1rem;
+        }
+    }
+
+    /* Анимация появления */
+    footer {
+        animation: fadeInUp 0.8s ease-out;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+
+    .tour-card {
+        transition: transform 0.3s ease;
+        margin-bottom: 20px;
+    }
+
+    .tour-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .navbar-brand {
+        font-weight: bold;
+    }
+
+    .flash-messages {
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        z-index: 1000;
+        min-width: 300px;
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

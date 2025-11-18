@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Мои заказы - Туристическое Агентство{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4"><i class="fas fa-shopping-bag me-2"></i>Мои заказы</h1>
+
+    {% if orders %}
+    <div class="row">
+        {% for order in orders %}
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Заказ #{{ order.id }}</h5>
+                    <span class="badge 
+                        {% if order.status == 'Подтвержден' %}bg-success
+                        {% elif order.status == 'Ожидание' %}bg-warning
+                        {% elif order.status == 'Отменен' %}bg-danger
+                        {% elif order.status == 'Завершен' %}bg-info{% endif %}">
+                        {{ order.status }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <h6 class="card-title">{{ order.tour.name }}</h6>
+                    <div class="mb-2">
+                        <small class="text-muted">
+                            <i class="fas fa-map-marker-alt me-1"></i>{{ order.tour.destination }}
+                        </small>
+                    </div>
+
+                    <div class="order-details">
+                        <div class="row small text-muted">
+                            <div class="col-6">Даты:</div>
+                            <div class="col-6">{{ order.start_date }} - {{ order.end_date }}</div>
+                        </div>
+                        <div class="row small text-muted">
+                            <div class="col-6">Количество гостей:</div>
+                            <div class="col-6">{{ order.guests_count }} человек</div>
+                        </div>
+                        <div class="row small text-muted">
+                            <div class="col-6">Общая стоимость:</div>
+                            <div class="col-6">{{ "%.2f"|format(order.total_price) }} ₽</div>
+                        </div>
+                        <div class="row small text-muted">
+                            <div class="col-6">Статус:</div>
+                            <div class="col-6">
+                                {% if order.status == 'Ожидание' %}
+                                    <span class="text-warning">⏳ Ожидает подтверждения</span>
+                                {% elif order.status == 'Подтвержден' %}
+                                    <span class="text-success">✅ Подтвержден администратором</span>
+                                {% elif order.status == 'Отменен' %}
+                                    <span class="text-danger">❌ Отменен</span>
+                                {% else %}
+                                    <span class="text-info">🏁 Завершен</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if order.special_requests %}
+                    <div class="mt-3">
+                        <strong>Ваши пожелания:</strong>
+                        <p class="small text-muted mb-0">{{ order.special_requests }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            Создан: {{ order.created_at.strftime('%d.%m.%Y в %H:%M') }}
+                        </small>
+                        {% if order.status == 'Ожидание' or order.status == 'Подтвержден' %}
+                        <a href="{{ url_for('cancel_order', order_id=order.id) }}"
+                           class="btn btn-outline-danger btn-sm"
+                           onclick="return confirm('Вы уверены, что хотите отменить этот заказ?')">
+                            <i class="fas fa-times me-1"></i>Отменить
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-shopping-bag fa-4x text-muted mb-4"></i>
+        <h4 class="text-muted">У вас пока нет заказов</h4>
+        <p class="text-muted mb-4">Начните свое путешествие с выбора тура</p>
+        <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg">
+            <i class="fas fa-search me-2"></i>Найти тур
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

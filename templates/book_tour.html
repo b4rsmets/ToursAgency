@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}Бронирование {{ tour.name }} - Туристическое Агентство{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Главная</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('tour_detail', tour_id=tour.id) }}">{{ tour.name }}</a></li>
+            <li class="breadcrumb-item active">Бронирование</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-calendar-check me-2"></i>Бронирование тура</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="guests_count" class="form-label">Количество человек *</label>
+                                <select class="form-select" id="guests_count" name="guests_count" required>
+                                    {% for i in range(1, 11) %}
+                                    <option value="{{ i }}" {% if i == 2 %}selected{% endif %}>{{ i }} человек</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="start_date" class="form-label">Дата начала тура *</label>
+                                <input type="date" class="form-control" id="start_date" name="start_date" 
+                                       min="{{ today }}" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="contact_phone" class="form-label">Контактный телефон *</label>
+                                <input type="tel" class="form-control" id="contact_phone" name="contact_phone" 
+                                       value="{{ current_user.phone or '' }}" required placeholder="+7 XXX XXX-XX-XX">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="contact_email" class="form-label">Email для подтверждения *</label>
+                                <input type="email" class="form-control" id="contact_email" name="contact_email"
+                                       value="{{ current_user.email }}" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="special_requests" class="form-label">Особые пожелания</label>
+                            <textarea class="form-control" id="special_requests" name="special_requests"
+                                      rows="4" placeholder="Дополнительные пожелания к туру..."></textarea>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <h6>Информация о туре:</h6>
+                            <ul class="mb-0">
+                                <li>Тур: <strong>{{ tour.name }}</strong></li>
+                                <li>Продолжительность: <strong>{{ tour.duration_days }} дней</strong></li>
+                                <li>Направление: <strong>{{ tour.destination }}</strong></li>
+                                <li>Цена за человека: <strong>{{ "%.2f"|format(tour.price) }} ₽</strong></li>
+                                <li>Итого: <strong id="total-price">{{ "%.2f"|format(tour.price * 2) }} ₽</strong> (за 2 человек)</li>
+                            </ul>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('tour_detail', tour_id=tour.id) }}" class="btn btn-secondary me-md-2">Назад</a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-check me-1"></i>Подтвердить бронирование
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Информация о туре</h5>
+                    <img src="{{ tour.image_url }}" class="card-img-top mb-3" alt="{{ tour.name }}" style="height: 200px; object-fit: cover;">
+                    <h6>{{ tour.name }}</h6>
+                    <p class="text-muted">{{ tour.description[:100] }}...</p>
+                    <div class="tour-details">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Направление:</span>
+                            <strong>{{ tour.destination }}</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Продолжительность:</span>
+                            <strong>{{ tour.duration_days }} дней</strong>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span>Цена за человека:</span>
+                            <strong>{{ "%.2f"|format(tour.price) }} ₽</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const guestsSelect = document.getElementById('guests_count');
+    const totalPrice = document.getElementById('total-price');
+    const pricePerPerson = {{ tour.price }};
+
+    function updatePrice() {
+        const guests = parseInt(guestsSelect.value);
+        const total = pricePerPerson * guests;
+        totalPrice.textContent = total.toFixed(2) + ' ₽ (за ' + guests + ' человек)';
+    }
+
+    guestsSelect.addEventListener('change', updatePrice);
+
+    // Установка минимальной даты (сегодня)
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('start_date').min = today;
+});
+</script>
+{% endblock %}

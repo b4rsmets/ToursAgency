@@ -1,0 +1,296 @@
+{% extends "base.html" %}
+
+{% block title %}Редактировать тур{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <!-- Заголовок с иконкой -->
+            <div class="text-center mb-5">
+                <div class="bg-warning bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                     style="width: 80px; height: 80px;">
+                    <i class="fas fa-edit text-white fa-2x"></i>
+                </div>
+                <h1 class="h2 fw-bold text-dark mb-2">Редактировать тур</h1>
+                <p class="text-muted">Обновите информацию о туре "{{ tour.name }}"</p>
+            </div>
+
+            <!-- Карточка формы -->
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-warning text-dark py-4">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-pencil-alt me-2"></i>Редактирование тура
+                    </h3>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" class="needs-validation" novalidate>
+                        <!-- Название тура -->
+                        <div class="mb-4">
+                            <label for="name" class="form-label fw-semibold text-dark">
+                                <i class="fas fa-heading text-primary me-2"></i>Название тура
+                            </label>
+                            <input type="text"
+                                   id="name"
+                                   name="name"
+                                   value="{{ tour.name }}"
+                                   required
+                                   class="form-control form-control-lg"
+                                   placeholder="Введите название тура">
+                            <div class="form-text">Укажите привлекательное название для тура</div>
+                        </div>
+
+                        <!-- Описание -->
+                        <div class="mb-4">
+                            <label for="description" class="form-label fw-semibold text-dark">
+                                <i class="fas fa-align-left text-primary me-2"></i>Описание тура
+                            </label>
+                            <textarea id="description"
+                                      name="description"
+                                      required
+                                      rows="4"
+                                      class="form-control"
+                                      placeholder="Опишите основные особенности и преимущества тура">{{ tour.description }}</textarea>
+                            <div class="form-text">Подробно опишите, что включено в тур</div>
+                        </div>
+
+                        <!-- Цена и продолжительность в одной строке -->
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label for="price" class="form-label fw-semibold text-dark">
+                                    <i class="fas fa-dollar-sign text-success me-2"></i>Стоимость тура
+                                </label>
+                                <div class="input-group">
+                                    <input type="number"
+                                           id="price"
+                                           name="price"
+                                           step="0.01"
+                                           value="{{ tour.price }}"
+                                           required
+                                           class="form-control"
+                                           placeholder="0.00">
+                                    <span class="input-group-text">₽</span>
+                                </div>
+                                <div class="form-text">Укажите стоимость за одного человека</div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label for="duration_days" class="form-label fw-semibold text-dark">
+                                    <i class="fas fa-calendar-day text-warning me-2"></i>Продолжительность
+                                </label>
+                                <div class="input-group">
+                                    <input type="number"
+                                           id="duration_days"
+                                           name="duration_days"
+                                           value="{{ tour.duration_days }}"
+                                           required
+                                           class="form-control"
+                                           placeholder="0">
+                                    <span class="input-group-text">дней</span>
+                                </div>
+                                <div class="form-text">Общее количество дней тура</div>
+                            </div>
+                        </div>
+
+                        <!-- Направление -->
+                        <div class="mb-4">
+                            <label for="destination" class="form-label fw-semibold text-dark">
+                                <i class="fas fa-map-marker-alt text-danger me-2"></i>Направление
+                            </label>
+                            <input type="text"
+                                   id="destination"
+                                   name="destination"
+                                   value="{{ tour.destination }}"
+                                   required
+                                   class="form-control"
+                                   placeholder="Например: Париж, Франция">
+                            <div class="form-text">Укажите страну и город назначения</div>
+                        </div>
+
+                        <!-- URL изображения -->
+                        <div class="mb-4">
+                            <label for="image_url" class="form-label fw-semibold text-dark">
+                                <i class="fas fa-image text-info me-2"></i>Ссылка на изображение
+                            </label>
+                            <input type="url"
+                                   id="image_url"
+                                   name="image_url"
+                                   value="{{ tour.image_url }}"
+                                   class="form-control"
+                                   placeholder="https://example.com/image.jpg">
+                            <div class="form-text">
+                                <small>Оставьте пустым для использования изображения по умолчанию</small>
+                            </div>
+                        </div>
+
+                        <!-- Предпросмотр изображения -->
+                        {% if tour.image_url %}
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold text-dark">
+                                <i class="fas fa-eye me-2"></i>Текущее изображение
+                            </label>
+                            <div class="border rounded p-3 bg-light">
+                                <img src="{{ tour.image_url }}"
+                                     alt="{{ tour.name }}"
+                                     class="img-fluid rounded"
+                                     style="max-height: 200px; object-fit: cover;"
+                                     onerror="this.style.display='none'">
+                                <div class="mt-2 text-center">
+                                    <small class="text-muted">Текущее изображение тура</small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Кнопки действий -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a href="{{ url_for('index') }}" class="btn btn-outline-secondary me-md-2">
+                                <i class="fas fa-times me-2"></i>Отмена
+                            </a>
+                            <button type="submit" class="btn btn-warning btn-lg px-4">
+                                <i class="fas fa-save me-2"></i>Сохранить изменения
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Информация о туре -->
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card border-info">
+                        <div class="card-header bg-info text-white">
+                            <i class="fas fa-info-circle me-2"></i>Информация о туре
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled mb-0">
+                                <li class="mb-2">
+                                    <i class="fas fa-hashtag text-muted me-2"></i>
+                                    <strong>ID:</strong> {{ tour.id }}
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-calendar-plus text-muted me-2"></i>
+                                    <strong>Создан:</strong>
+                                    {% if tour.created_at %}
+                                        {{ tour.created_at.strftime('%d.%m.%Y') }}
+                                    {% else %}
+                                        Не указано
+                                    {% endif %}
+                                </li>
+                                <li class="mb-0">
+                                    <i class="fas fa-toggle-on text-muted me-2"></i>
+                                    <strong>Статус:</strong>
+                                    <span class="badge bg-{% if tour.is_active %}success{% else %}secondary{% endif %}">
+                                        {{ 'Активен' if tour.is_active else 'Неактивен' }}
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card border-danger">
+                        <div class="card-header bg-danger text-white">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Опасная зона
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text small mb-3">Удаление тура невозможно отменить. Все данные будут утеряны.</p>
+                            <a href="{{ url_for('delete_tour', tour_id=tour.id) }}"
+                               class="btn btn-outline-danger btn-sm w-100"
+                               onclick="return confirm('Вы уверены, что хотите удалить тур \"{{ tour.name }}\"?')">
+                                <i class="fas fa-trash me-2"></i>Удалить тур
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Стили для улучшения внешнего вида -->
+<style>
+.card {
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.card-header {
+    border-radius: 15px 15px 0 0 !important;
+}
+
+.form-control {
+    border-radius: 10px;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.1);
+}
+
+.form-label {
+    font-size: 0.95rem;
+}
+
+.btn {
+    border-radius: 10px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.alert {
+    border-radius: 12px;
+}
+
+.input-group-text {
+    border-radius: 0 10px 10px 0;
+    background-color: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-left: none;
+}
+
+.form-control:not(:first-child) {
+    border-radius: 10px 0 0 10px;
+    border-right: none;
+}
+
+.badge {
+    font-size: 0.75em;
+}
+</style>
+
+<!-- JavaScript для валидации формы -->
+<script>
+// Валидация формы
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        var validation = Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+
+// Подтверждение перед удалением
+function confirmDelete() {
+    return confirm('Вы уверены, что хотите удалить тур \"{{ tour.name }}\"? Это действие нельзя отменить.');
+}
+
+// Автоматическое обновление предпросмотра изображения
+document.getElementById('image_url').addEventListener('input', function(e) {
+    const preview = document.querySelector('.border.rounded.p-3.bg-light img');
+    if (preview && e.target.value) {
+        preview.src = e.target.value;
+        preview.style.display = 'block';
+    }
+});
+</script>
+{% endblock %}

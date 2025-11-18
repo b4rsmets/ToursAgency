@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Герой секция -->
+<section class="hero-section">
+    <div class="container text-center">
+        <h1 class="display-4 fw-bold">Откройте мир с нами</h1>
+        <p class="lead">Лучшие туры по всему миру по доступным ценам</p>
+        {% if not current_user.is_authenticated %}
+        <a href="{{ url_for('register') }}" class="btn btn-light btn-lg mt-3">
+            Начать путешествие
+        </a>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Список туров -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Наши туры</h2>
+
+        {% if tours %}
+        <div class="row g-4">
+            {% for tour in tours %}
+            <div class="col-lg-4 col-md-6">
+                <div class="card tour-card shadow h-100">
+                    <div class="position-relative">
+                        <img src="{{ tour.image_url }}" class="card-img-top" alt="{{ tour.name }}" style="height: 250px; object-fit: cover;">
+                        <div class="position-absolute top-0 end-0 m-3">
+                            <span class="badge bgbadge fs-6">{{ tour.duration_days }} дней</span>
+                        </div>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title fw-bold text-dark">{{ tour.name }}</h5>
+
+                        <!-- Описание с фиксированной высотой и обрезанием -->
+                        <div class="card-text text-muted mb-3 flex-grow-1">
+                            <div class="tour-description" style="
+                                display: -webkit-box;
+                                -webkit-line-clamp: 3;
+                                -webkit-box-orient: vertical;
+                                overflow: hidden;
+                                line-height: 1.4;
+                                min-height: 4.2em;
+                            ">
+                                {{ tour.description }}
+                            </div>
+                        </div>
+
+                        <!-- Цена и локация -->
+                        <div class="mt-auto">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="h4 text-primary fw-bold">{{ tour.price }} ₽</span>
+                                <div class="text-muted">
+                                    <i class="fas fa-map-marker-alt me-1"></i>
+                                    <small>{{ tour.destination }}</small>
+                                </div>
+                            </div>
+
+                            <!-- Кнопка "Подробнее" -->
+                            <div class="d-grid mb-3">
+                                <a href="{{ url_for('tour_detail', tour_id=tour.id) }}" class="btn btn-outline-primary">
+                                    <i class="fas fa-info-circle me-1"></i>Подробнее о туре
+                                </a>
+                            </div>
+
+                            <!-- Кнопки для админа -->
+                            {% if current_user.is_authenticated and current_user.is_admin() %}
+                            <div class="d-grid gap-2">
+                                <div class="btn-group w-100">
+                                    <a href="{{ url_for('edit_tour', tour_id=tour.id) }}" class="btn btn-warning btn-sm">
+                                        <i class="fas fa-edit me-1"></i> Редактировать
+                                    </a>
+                                    <a href="{{ url_for('delete_tour', tour_id=tour.id) }}" class="btn btn-danger btn-sm"
+                                       onclick="return confirm('Вы уверены, что хотите удалить тур \"{{ tour.name }}\"?')">
+                                        <i class="fas fa-trash me-1"></i> Удалить
+                                    </a>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <div class="empty-state">
+                <i class="fas fa-globe-americas fa-4x text-muted mb-4"></i>
+                <h4 class="text-muted">Туры пока не добавлены</h4>
+                <p class="text-muted mb-4">Здесь появятся предложения туров</p>
+                {% if current_user.is_authenticated and current_user.is_admin() %}
+                <a href="{{ url_for('add_tour') }}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-plus me-2"></i>Добавить первый тур
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Стили для улучшения внешнего вида -->
+<style>
+.hero-section {
+    background: linear-gradient(135deg, #1ca61e 0%, #46610e 100%);
+    color: white;
+    padding: 100px 0;
+}
+
+.tour-card {
+    transition: all 0.3s ease;
+    border: none;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.tour-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 25px rgba(0,0,0,0.15) !important;
+}
+
+.card-img-top {
+    transition: transform 0.3s ease;
+}
+.bgbadge{
+    background-color: #46610e;
+}
+.tour-card:hover .card-img-top {
+    transform: scale(1.05);
+}
+
+.tour-description {
+    font-size: 0.95rem;
+}
+
+.badge {
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 0.5em 0.8em;
+}
+
+.empty-state {
+    padding: 3rem 0;
+}
+
+.btn-group .btn {
+    border-radius: 8px;
+}
+
+/* Гарантия одинаковой высоты карточек */
+.row.g-4 {
+    align-items: stretch;
+}
+
+/* Стили для кнопки "Подробнее" */
+.btn-outline-primary {
+    border: 2px solid #46610e;
+    color: #46610e;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-primary:hover {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 60px 0;
+    }
+
+    .hero-section h1 {
+        font-size: 2.5rem;
+    }
+
+    .card-body {
+        padding: 1.25rem;
+    }
+
+    .btn-group {
+        flex-direction: column;
+    }
+
+    .btn-group .btn {
+        border-radius: 8px;
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* Анимация появления карточек */
+.tour-card {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.text-primary {
+    background: linear-gradient(135deg, #46610e);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    const cards = document.querySelectorAll('.tour-card');
+    cards.forEach((card, index) => {
+        card.style.animationDelay = `${index * 0.1}s`;
+    });
+
+    const images = document.querySelectorAll('.card-img-top');
+    images.forEach(img => {
+        img.addEventListener('error', function() {
+            this.src = 'https://cdn.lifehacker.ru/wp-content/uploads/2010/02/4980CD4D-23DB-4551-A637-E0C8EFABA2AA.jpg';
+            this.alt = 'Изображение тура';
+        });
+    });
+});
+</script>
+{% endblock %}
