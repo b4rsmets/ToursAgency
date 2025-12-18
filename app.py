@@ -1,22 +1,27 @@
 import os
+import ssl
+from datetime import datetime, timedelta
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from models import db, User, Tour, Order
-from datetime import datetime, timedelta
-import ssl
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
 
-database_url = 'postgresql+pg8000://ilya:nfPE31Jkkps6BbDCVZwOKpBgHw3eUwrQ@dpg-d4e4g8h5pdvs73fkv8ig-a.oregon-postgres.render.com/toursdb_tz10'
+# Выберите только одну конфигурацию базы данных:
 
+# Вариант 1: Для локальной разработки
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:bars@localhost:5432/toursDB'
+
+database_url = 'postgresql+pg8000://ilya:nfPE31Jkkps6BbDCVZwOKpBgHw3eUwrQ@dpg-d4e4g8h5pdvs73fkv8ig-a.oregon-postgres.render.com/toursdb_tz10'
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
     'connect_args': {
         'ssl_context': ssl.create_default_context()
     }
 }
+
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
 
@@ -28,69 +33,16 @@ login_manager.login_message = 'Пожалуйста, войдите для до�
 login_manager.login_message_category = 'warning'
 
 
-# Контекстный процессор для передачи текущей даты в шаблоны
-@app.context_processor
-def inject_today():
-    return {'today': datetime.now().date()}
-def init_database():
-    """Инициализация базы данных при первом запуске"""
-    with app.app_context():
-        db.create_all()
-
-        # Создаем администратора если его нет
-        if not User.query.filter_by(username='admin').first():
-            admin = User(username='admin', email='admin@tours.com', role='admin')
-            admin.set_password('admin123')
-            db.session.add(admin)
-
-        # Создаем тестового пользователя если его нет
-        if not User.query.filter_by(username='user').first():
-            user = User(username='user', email='user@example.com', role='user')
-            user.set_password('user123')
-            db.session.add(user)
-
-        # Добавляем тестовые туры если их нет
-        if Tour.query.count() == 0:
-            tours = [
-                Tour(
-                    name='Парижский романтизм',
-                    description='Романтическая прогулка по Парижу с посещением Эйфелевой башни и Лувра.',
-                    price=1500.0,
-                    duration_days=7,
-                    destination='Париж, Франция',
-                    image_url='https://images.unsplash.com/photo-1502602898536-47ad22581b52?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
-                ),
-                Tour(
-                    name='Горные приключения в Альпах',
-                    description='Трекинг и катание на лыжах в швейцарских Альпах.',
-                    price=2500.0,
-                    duration_days=10,
-                    destination='Альпы, Швейцария',
-                    image_url='https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
-                ),
-                Tour(
-                    name='Пляжный релакс на Бали',
-                    description='Расслабьтесь на белоснежных пляжах с йогой и спа.',
-                    price=2000.0,
-                    duration_days=14,
-                    destination='Бали, Индонезия',
-                    image_url='https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
-                )
-            ]
-            db.session.bulk_save_objects(tours)
-
-        try:
-            db.session.commit()
-            print("✅ База данных инициализирована!")
-        except Exception as e:
-            db.session.rollback()
-            print(f"❌ Ошибка инициализации: {e}")
-
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
 
+@app.context_processor
+def inject_today():
+    return {'today': datetime.now().date()}
+
+
 def init_database():
     """Инициализация базы данных при первом запуске"""
     with app.app_context():
@@ -101,12 +53,14 @@ def init_database():
             admin = User(username='admin', email='admin@tours.com', role='admin')
             admin.set_password('admin123')
             db.session.add(admin)
+            print("✅ Администратор создан (логин: admin, пароль: admin123)")
 
         # Создаем тестового пользователя если его нет
         if not User.query.filter_by(username='user').first():
             user = User(username='user', email='user@example.com', role='user')
             user.set_password('user123')
             db.session.add(user)
+            print("✅ Тестовый пользователь создан (логин: user, пароль: user123)")
 
         # Добавляем тестовые туры если их нет
         if Tour.query.count() == 0:
@@ -137,10 +91,11 @@ def init_database():
                 )
             ]
             db.session.bulk_save_objects(tours)
+            print("✅ Тестовые туры добавлены")
 
         try:
             db.session.commit()
-            print("✅ База данных инициализирована!")
+            print("✅ База данных инициализирована успешно!")
         except Exception as e:
             db.session.rollback()
             print(f"❌ Ошибка инициализации: {e}")
@@ -151,7 +106,8 @@ def init_database():
 def index():
     try:
         tours = Tour.query.all()
-    except:
+    except Exception as e:
+        print(f"Ошибка при загрузке туров: {e}")
         tours = []
     return render_template('index.html', tours=tours)
 
@@ -456,6 +412,7 @@ def delete_order(order_id):
 
     return redirect(url_for('admin_orders'))
 
+
 # Профиль пользователя
 @app.route('/profile')
 @login_required
@@ -464,5 +421,8 @@ def profile():
 
 
 if __name__ == '__main__':
+    # Инициализируем базу данных
     init_database()
+
+    # Запускаем приложение
     app.run(debug=True)
