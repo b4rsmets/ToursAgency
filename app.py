@@ -12,8 +12,7 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-i
 
 # Вариант 1: Для локальной разработки
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:bars@localhost:5432/toursDB'
-
-database_url = 'postgresql+pg8000://ilya:nfPE31Jkkps6BbDCVZwOKpBgHw3eUwrQ@dpg-d4e4g8h5pdvs73fkv8ig-a.oregon-postgres.render.com/toursdb_tz10'
+database_url = 'postgresql+pg8000://tours:6ACpslgGZwopNuWfSGlsBFgjZV2Y4Fi0@dpg-d520bvshg0os73cm2s3g-a.oregon-postgres.render.com/tours_zt2q'
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
     'connect_args': {
